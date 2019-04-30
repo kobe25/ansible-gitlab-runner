@@ -1,4 +1,9 @@
 ---
+- name: Copy GitLab Server CA
+  copy:
+    src: ./gitlab.crt
+    dest: /etc/gitlab-runner/gitlab.crt
+
 - name: Register runner to GitLab
   command: >
     gitlab-runner register
@@ -46,6 +51,7 @@
     {% if gitlab_runner.extra_registration_option is defined %}
     {{ gitlab_runner.extra_registration_option }}
     {% endif %}
+    --tls-ca-file /etc/gitlab-runner/gitlab.crt
   when:
     - configured_runners.stderr.find('\n' + gitlab_runner.name|default(ansible_hostname+'-'+gitlab_runner_index|string)) == -1
     - gitlab_runner.state|default('present') == 'present'
